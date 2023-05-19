@@ -78,7 +78,6 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         socket.leave(socket.handshake.auth.game_id)
-        console.log('user disconnected: '+socket.handshake.auth.game_id);
     });
 });
 
