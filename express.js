@@ -23,6 +23,10 @@ app.post('/generate', (req, res) => {
     res.send({id: id});
 });
 
+app.use('/', express.static('public'))
+app.use('/game/:id', express.static('public'))
+app.use('/about', express.static('public'))
+
 io.on('connection', (socket) => {
     console.log('a user connected id='+socket.id);
 
