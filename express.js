@@ -19,7 +19,11 @@ let games = {};
 app.post('/generate', (req, res) => {
     const id = uid(16);
 
-    games[id] = {};
+    games[id] = {
+        admin_id: req.body.player_id,
+        players: {}
+    };
+
     res.send({id: id});
 });
 
@@ -28,60 +32,62 @@ app.use('/game/:id', express.static('public'))
 app.use('/about', express.static('public'))
 
 io.on('connection', (socket) => {
-    console.log('a user connected id='+socket.id);
-
-    let game_id = socket.handshake.auth.game_id,
-        user_id = socket.handshake.auth.user_id;
+    let game_id = socket.handshake.auth.game_id;
 
     if(!games.hasOwnProperty(game_id)) {
+        socket.disconnect();
         return;
-    }
-
-    if(!games[game_id].hasOwnProperty(user_id)) {
-        games[game_id][user_id] = {name: null, points: null}
     }
 
     let currentGame = games[game_id];
 
     socket.join(socket.handshake.auth.game_id);
-    io.to(game_id).emit("users", currentGame);
+    io.to(game_id).emit("players", currentGame.players);
 
-    socket.on('join', (...args) => {
-        let data = args.pop(),
-            name = data.name,
-            user_id = socket.handshake.auth.user_id;
+    socket.on('join', (data, callback) => {
+        let name = data.name,
+            player_id = socket.handshake.auth.player_id;
 
-        io.to(game_id).emit("greet", "Hi "+name);
-        games[game_id][user_id] = {user_id: user_id, name: name, points: null};
-        io.to(game_id).emit("users", currentGame);
+        games[game_id].players[player_id] = {player_id: player_id, name: name, points: null};
+        io.to(game_id).emit("players", currentGame.players);
+
+        callback({
+            isAdmin: socket.handshake.auth.player_id ===  games[game_id].admin_id
+        });
     });
 
     socket.on("points", (...args) => {
-        let currentUser = args.pop();
-        games[game_id][currentUser.user_id] = currentUser;
-        io.to(game_id).emit("users", currentGame);
+        let data = args.pop();
+        games[game_id].players[socket.handshake.auth.player_id].points = data.points;
+        io.to(game_id).emit("players", currentGame.players);
     });
 
     socket.on("reveal", (...args) => {
-        io.to(game_id).emit("reveal");
+        if(games[game_id].admin_id === socket.handshake.auth.player_id) {
+            io.to(game_id).emit("reveal");
+        }
     });
 
     socket.on("reset", (...args) => {
-        currentGame = games[game_id];
+        if(games[game_id].admin_id === socket.handshake.auth.player_id) {
+            currentGame = games[game_id];
 
-        for(let key in currentGame) {
-            currentGame[key].points = null;
+            for (let key in currentGame.players) {
+                currentGame.players[key].points = null;
+            }
+
+            games[game_id] = currentGame;
+
+            io.to(game_id).emit("reset");
+            io.to(game_id).emit("players", currentGame.players);
         }
-
-        games[game_id] = currentGame;
-
-        io.to(game_id).emit("reset");
-        io.to(game_id).emit("users", currentGame);
     });
 
 
     socket.on('disconnect', () => {
-        socket.leave(socket.handshake.auth.game_id)
+        socket.leave(socket.handshake.auth.game_id);
+        delete games[socket.handshake.auth.game_id].players[socket.handshake.auth.player_id];
+        io.to(game_id).emit("players", games[socket.handshake.auth.game_id].players);
     });
 });
 

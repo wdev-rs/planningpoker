@@ -4,7 +4,8 @@ import { io } from "socket.io-client";
 export const state = reactive({
     connected: false,
     greetEvents: [],
-    users: [],
+    players: {},
+    isAdmin: false,
     game: {
         status: null
     }
@@ -23,10 +24,6 @@ socket.on("disconnect", () => {
     state.connected = false;
 });
 
-socket.on("greet", (...args) => {
-    state.greetEvents.push(args);
-});
-
-socket.on("users", (...args) => {
-    state.users = args.pop();
+socket.on("players", (...args) => {
+    state.players = args.pop();
 });

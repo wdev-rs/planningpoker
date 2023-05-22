@@ -9,7 +9,7 @@ const GAME_STATUS_REVEALED = 'revealed';
 export default {
     data() {
         return {
-            user_id: null,
+            player_id: null,
             game_id: null,
             name: '',
             points: null,
@@ -19,23 +19,26 @@ export default {
 
         this.game_id = this.$route.params.id;
 
-        this.user_id = sessionStorage.getItem(this.game_id + '_user_id');
-        if (sessionStorage.getItem(this.game_id + '_user_name')) {
-            this.name = sessionStorage.getItem(this.game_id + '_user_name');
+        this.player_id = sessionStorage.getItem(this.game_id + '_player_id');
+        if (sessionStorage.getItem(this.game_id + '_player_name')) {
+            this.name = sessionStorage.getItem(this.game_id + '_player_name');
         }
 
 
-        if (!this.user_id) {
-            this.user_id = 'user_' + uid(16);
-            sessionStorage.setItem(this.game_id + '_user_id', this.user_id);
+        if (!this.player_id) {
+            this.player_id = uid(16);
+            sessionStorage.setItem(this.game_id + '_player_id', this.player_id);
         }
 
         socket.auth = {
             game_id: this.$route.params.id,
-            user_id: this.user_id
+            player_id: this.player_id
         };
         socket.connect();
 
+        if(this.name) {
+            this.joinGame();
+        }
 
         socket.on("reveal", (...args) => {
             state.game.status = GAME_STATUS_REVEALED;
@@ -49,16 +52,15 @@ export default {
     methods: {
         joinGame() {
             socket.emit('join', {
-                user_id: this.user_id,
                 name: this.name
+            },(response) => {
+                state.isAdmin = response.isAdmin
             });
 
-            sessionStorage.setItem(this.game_id + '_user_name', this.name);
+            sessionStorage.setItem(this.game_id + '_player_name', this.name);
         },
         sendPoints() {
             socket.emit('points', {
-                user_id: this.user_id,
-                name: this.name,
                 points: this.points
             });
         },
@@ -74,17 +76,17 @@ export default {
         connected() {
             return state.connected;
         },
-        greetings() {
-            return state.greetEvents;
-        },
-        users() {
-            return state.users;
+        players() {
+            return state.players;
         },
         game() {
             return state.game
         },
         isRevealed() {
             return state.game.status === GAME_STATUS_REVEALED;
+        },
+        isAdmin() {
+            return state.isAdmin;
         }
     }
 }
@@ -103,15 +105,16 @@ export default {
             <input type="text" v-model="points">
             <button @click="sendPoints">Send</button>
         </div>
-        <div>
-            <button @click="reveal">Reveal</button>
+        <div v-if="isAdmin">
+            <div>
+                <button @click="reveal">Reveal</button>
+            </div>
+            <div>
+                <button @click="reset">Reset</button>
+            </div>
         </div>
-        <div>
-            <button @click="reset">Reset</button>
-        </div>
-
         <div>Players</div>
-        <div v-for="user in users">
+        <div v-for="user in players">
             <span>{{ user.name }}</span><span v-if="isRevealed"> : {{ user.points }}</span><span
             v-else>{{ user.points > 0 ? '*' : '' }}</span>
         </div>
