@@ -21,7 +21,7 @@ export default {
                 this.player_id = uid(16);
             }
 
-            axios.post('http://localhost:3000/generate', {
+            axios.post('/generate', {
                 player_id: this.player_id
             }).then(
                 (response) => {
