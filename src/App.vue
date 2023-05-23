@@ -6,10 +6,10 @@ import { RouterLink, RouterView } from 'vue-router'
   <header>
     <div class="wrapper">
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+        <div class="w3-bar w3-black">
+            <RouterLink to="/" class="w3-bar-item w3-button">Home</RouterLink>
+            <RouterLink to="/about" class="w3-bar-item w3-button">About</RouterLink>
+        </div>
     </div>
   </header>
 
