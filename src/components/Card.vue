@@ -42,6 +42,7 @@ export default {
     .card{
         height: 230px;
         width: 180px;
+        cursor: pointer;
     }
 
     .points {
