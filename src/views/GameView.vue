@@ -56,6 +56,7 @@ export default {
 
         socket.on("reset", (...args) => {
             this.points = null;
+            this.selectBonusPoint();
             state.game.status = GAME_STATUS_PLAYING;
         });
     },
@@ -91,8 +92,6 @@ export default {
             socket.emit('reveal');
         },
         reset() {
-            this.points = null;
-            this.selectBonusPoint();
             socket.emit('reset');
         },
         selectBonusPoint() {
