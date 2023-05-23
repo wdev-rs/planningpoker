@@ -6,15 +6,22 @@ export default {
         isSelected: false,
         isRevealed: false,
         isReady: false,
+        isMyCard: false,
+        isBottomCard: false,
     }
 }
 </script>
 
 
 <template>
-    <div class="card w3-card w3-yellow w3-round-large" :class="{selected: isSelected}" @click="$emit('point-selected', points)">
+    <div class="w3-card w3-yellow w3-round-large card"
+         :class="{selected: isSelected, 'w3-border w3-border-green': isMyCard, 'bottom-card': isBottomCard}"
+
+         @click="$emit('point-selected', points)"
+    >
+
         <header class="w3-container w3-center">
-            <h1>{{ name ? name : '&nbsp' }}</h1>
+            <h3>{{ name ? name : '&nbsp' }}</h3>
         </header>
 
         <div v-if="isRevealed" class="w3-container w3-center">
@@ -27,9 +34,14 @@ export default {
 </template>
 
 <style scoped>
+
+    .bottom-card{
+        padding-right: 30px;
+    }
+
     .card{
-        min-height: 200px;
-        min-width: 150px;
+        height: 230px;
+        width: 180px;
     }
 
     .points {

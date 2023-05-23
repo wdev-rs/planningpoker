@@ -1,6 +1,6 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="w3-containter w3-padding-64 w3-center">
+    <h1>Planning poker by <a href="https://www.wdev.rs" target="_blank">WDev</a></h1>
   </div>
 </template>
 

@@ -17,12 +17,15 @@ export default {
             game_id: null,
             name: '',
             points: null,
-            showModal: false
+            showModal: false,
+            bonusPoint: null,
         }
     },
     mounted() {
 
         this.game_id = this.$route.params.id;
+
+        this.selectBonusPoint();
 
         this.player_id = sessionStorage.getItem(this.game_id + '_player_id');
         if (sessionStorage.getItem(this.game_id + '_player_name')) {
@@ -43,8 +46,7 @@ export default {
 
         if (this.name) {
             this.joinGame();
-        }
-        else {
+        } else {
             this.showModal = true;
         }
 
@@ -53,7 +55,7 @@ export default {
         });
 
         socket.on("reset", (...args) => {
-            this.selecteblePoints = null;
+            this.points = null;
             state.game.status = GAME_STATUS_PLAYING;
         });
     },
@@ -73,7 +75,7 @@ export default {
             });
         },
         setPoints(points) {
-            if(this.isRevealed) {
+            if (this.isRevealed) {
                 return;
             }
 
@@ -90,7 +92,13 @@ export default {
         },
         reset() {
             this.points = null;
+            this.selectBonusPoint();
             socket.emit('reset');
+        },
+        selectBonusPoint() {
+            let points = ['🍺', '🍨', '☕', '🌮', '🍕','🍪', '🍫'];
+
+            this.bonusPoint = points[Math.floor(Math.random() * points.length)];
         }
     },
     computed: {
@@ -110,51 +118,63 @@ export default {
             return state.isAdmin;
         },
         selectablePoints() {
-            return [1, 2, 3, 5, 8, 13]
-        }
+            return [1, 2, 3, 5, 8, 13];
+        },
     }
 }
 </script>
 
 <template>
     <main>
-        <div class="w3-container w3-auto w3-margin-top">
-            <div class="w3-row" v-if="isAdmin">
-                <div class="w3-col l2">
-                    <button class="w3-button w3-xlarge w3-round-xlarge w3-green" @click="reveal">Reveal</button>
-                </div>
-                <div class="w3-col l2">
-                    <button class="w3-button w3-xlarge w3-round-xlarge w3-blue" @click="reset">Restart</button>
-                </div>
-                <div class="w3-col l2">
-                    <a href="/" class="w3-button w3-xlarge w3-round-xlarge w3-red">End the game</a>
+        <div class="w3-container w3-padding-top-32 w3-margin-top">
+            <div class="w3-row">
+                <span v-if="isAdmin">
+                    <div class="w3-col l1">
+                        <button class="w3-button w3-xlarge w3-round-large w3-green" @click="reveal">Reveal</button>
+                    </div>
+                    <div class="w3-col l1">
+                        <button class="w3-button w3-xlarge w3-round-large w3-blue" @click="reset">Restart</button>
+                    </div>
+                 </span>
+                <div class="w3-col l1">
+                    <button class="w3-button w3-xlarge w3-white w3-border w3-border-green w3-round-large  w3-text-green" @click="showModal=true">Change my name
+                    </button>
                 </div>
             </div>
         </div>
 
         <div id="id01" class="w3-modal" :style="showModal ? 'display: block' : 'display: none'">
-            <div class="w3-modal-content w3-round">
+            <div class="w3-modal-content w3-round" style="max-width:450px">
                 <div class="w3-container">
-      <span onclick="document.getElementById('id01').style.display='none'"
+      <span @click="showModal = false;"
             class="w3-button w3-display-topright">&times;</span>
                     <div class="w3-section">
-                        <label><b>Name</b></label>
-                        <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter name" name="usrname" required v-model="name">
-                        <button @click="showModal = false; this.joinGame()" class="w3-button w3-block w3-green w3-section w3-padding w3-round" type="submit">Join</button>
+                        <label><b>Enter your name</b></label>
+                        <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter your name"
+                               name="usrname" required v-model="name">
+                        <button @click="showModal = false; this.joinGame()"
+                                class="w3-button w3-block w3-green w3-section w3-padding w3-round" type="submit">Join
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="w3-container w3-auto w3-margin-top">
+        <div class="w3-container w3-margin-top w3-padding-64">
             <div v-for="player in players" class="w3-container w3-cell">
-                <card :name="player.name" :points="player.points" :is-revealed="this.isRevealed" :is-ready="player.points"></card>
+                <card :name="player.name" :points="player.points" :is-revealed="this.isRevealed"
+                      :is-ready="player.points" :is-my-card="player.player_id === this.player_id"></card>
             </div>
         </div>
 
-        <div class="w3-container w3-auto w3-margin-top">
-            <div v-for="point in selectablePoints" class="w3-container w3-cell">
-                <card name="" :points="point" @point-selected="setPoints" :is-selected="this.points === point" is-revealed="true"></card>
+        <div class="w3-container w3-row w3-margin-top w3-padding-64">
+            <div v-for="point in selectablePoints" class="w3-container w3-col l1 m3">
+                <card name="" :points="point" @point-selected="setPoints" :is-selected="this.points === point"
+                      is-revealed="true" :is-bottom-card="true"></card>
+            </div>
+            <div class="w3-container w3-col l1 m3">
+                <card name="" :points="bonusPoint" @point-selected="setPoints" :is-selected="this.points === bonusPoint"
+                      is-revealed="true"></card>
             </div>
         </div>
     </main>

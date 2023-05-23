@@ -43,12 +43,10 @@ export default {
 
 <template>
   <main>
-      <div>
-          Planning poker is connected={{ connected }}
-
-          <button @click="generateGame">Generate game</button>
-
-          <a :href="url">Url</a>
+      <div class="w3-container w3-auto w3-center w3-margin-top w3-padding-64">
+          <h1>Welcome to the planning poker.</h1>
+          <p>To start a new game, click on the button below.</p>
+          <button class="w3-button w3-xlarge w3-round-xlarge w3-green" @click="generateGame">Start new game</button>
       </div>
   </main>
 </template>
