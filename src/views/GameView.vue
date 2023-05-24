@@ -125,21 +125,12 @@ export default {
 
 <template>
     <main>
-        <div class="w3-container w3-padding-top-32 w3-margin-top">
-            <div class="w3-row">
-                <span v-if="isAdmin">
-                    <div class="w3-col l1">
-                        <button class="w3-button w3-xlarge w3-round-large w3-green" @click="reveal">Reveal</button>
-                    </div>
-                    <div class="w3-col l1">
-                        <button class="w3-button w3-xlarge w3-round-large w3-blue" @click="reset">Restart</button>
-                    </div>
-                 </span>
-                <div class="w3-col l1">
-                    <button class="w3-button w3-xlarge w3-white w3-border w3-border-green w3-round-large  w3-text-green" @click="showModal=true">Change my name
-                    </button>
-                </div>
-            </div>
+        <div class="w3-container w3-padding-top-16 w3-margin-top flexible-container">
+            <span v-if="isAdmin">
+                    <button class="w3-margin w3-button w3-large w3-round-large w3-green" @click="reveal">Reveal</button>
+                    <button class="w3-margin w3-button w3-large w3-round-large w3-blue" @click="reset">Restart</button>
+             </span>
+            <button class="w3-margin w3-button w3-large w3-white w3-border w3-border-green w3-round-large  w3-text-green" @click="showModal=true">Change my name</button>
         </div>
 
         <div id="id01" class="w3-modal" :style="showModal ? 'display: block' : 'display: none'">
@@ -150,7 +141,7 @@ export default {
                     <div class="w3-section">
                         <label><b>Enter your name</b></label>
                         <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter your name"
-                               name="usrname" required v-model="name">
+                               name="usrname" required v-model="name" @keyup.enter="showModal = false; this.joinGame()">
                         <button @click="showModal = false; this.joinGame()"
                                 class="w3-button w3-block w3-green w3-section w3-padding w3-round" type="submit">Join
                         </button>
@@ -159,22 +150,30 @@ export default {
             </div>
         </div>
 
-        <div class="w3-container w3-margin-top w3-padding-64">
-            <div v-for="player in players" class="w3-container w3-cell">
+        <div class="w3-container w3-margin-top w3-padding-32 flexible-container">
+            <div v-for="player in players" class="w3-container w3-margin-top">
                 <card :name="player.name" :points="player.points" :is-revealed="this.isRevealed"
                       :is-ready="player.points" :is-my-card="player.player_id === this.player_id"></card>
             </div>
         </div>
 
-        <div class="w3-container w3-row w3-margin-top w3-padding-64">
-            <div v-for="point in selectablePoints" class="w3-container w3-col l1 m3">
+        <div class="w3-container w3-row w3-margin-top w3-padding-64 flexible-container">
+            <div v-for="point in selectablePoints" class="w3-container w3-margin-top">
                 <card name="" :points="point" @point-selected="setPoints" :is-selected="this.points === point"
                       is-revealed="true" :is-bottom-card="true"></card>
             </div>
-            <div class="w3-container w3-col l1 m3">
+            <div class="w3-container w3-margin-top">
                 <card name="" :points="bonusPoint" @point-selected="setPoints" :is-selected="this.points === bonusPoint"
                       is-revealed="true"></card>
             </div>
         </div>
     </main>
 </template>
+
+<style scoped>
+    .flexible-container {
+        display:flex;
+        flex-wrap: wrap
+    }
+
+</style>
