@@ -21,7 +21,7 @@ export default {
     >
 
         <header class="w3-container w3-center">
-            <h3>{{ name ? name : '&nbsp' }}</h3>
+            <h4>{{ name ? name : '&nbsp' }}</h4>
         </header>
 
         <div v-if="isRevealed" class="w3-container w3-center">
@@ -36,17 +36,16 @@ export default {
 <style scoped>
 
     .bottom-card{
-        padding-right: 30px;
     }
 
     .card{
-        height: 230px;
-        width: 180px;
+        height: 200px;
+        width: 145px;
         cursor: pointer;
     }
 
     .points {
-        font-size: 5em;
+        font-size: 4.5em;
     }
 
     .selected {
