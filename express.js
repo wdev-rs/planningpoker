@@ -58,7 +58,11 @@ io.on('connection', (socket) => {
 
     socket.on("points", (...args) => {
         let data = args.pop();
-        games[game_id].players[socket.handshake.auth.player_id].points = data.points;
+
+        if (games[game_id]?.players[socket?.handshake?.auth?.player_id]) {
+            games[game_id].players[socket.handshake.auth.player_id].points = data.points;
+        }
+
         io.to(game_id).emit("players", currentGame.players);
     });
 
@@ -92,5 +96,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3001, () => {
-    console.log('listening on *:3000');
+    console.log('listening on *:3001');
 });

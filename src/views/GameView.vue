@@ -19,6 +19,7 @@ export default {
             points: null,
             showModal: false,
             bonusPoint: null,
+            darkMode: false,
         }
     },
     mounted() {
@@ -96,8 +97,17 @@ export default {
         },
         selectBonusPoint() {
             let points = ['🍺', '🍨', '☕', '🌮', '🍕','🍪', '🍫'];
-
             this.bonusPoint = points[Math.floor(Math.random() * points.length)];
+        },
+        toggleDarkMode(){
+            this.darkMode = !this.darkMode;
+
+            if (this.darkMode) {
+                document.body.style.backgroundColor = '#3C3C3C';
+            }
+            else {
+                document.body.style.backgroundColor = '#FFF';
+            }
         }
     },
     computed: {
@@ -131,6 +141,7 @@ export default {
                     <button class="w3-margin w3-button w3-large w3-round-large w3-blue" @click="reset">Restart</button>
              </span>
             <button class="w3-margin w3-button w3-large w3-white w3-border w3-border-green w3-round-large  w3-text-green" @click="showModal=true">Change my name</button>
+            <button class="w3-margin w3-button w3-large w3-border w3-border-green w3-round-large  w3-text-green" :class="{'w3-white': darkMode, 'w3-black': !darkMode }" @click="toggleDarkMode">{{!darkMode ? 'Dark mode' : 'Light mode'}}</button>
         </div>
 
         <div id="id01" class="w3-modal" :style="showModal ? 'display: block' : 'display: none'">
@@ -141,7 +152,7 @@ export default {
                     <div class="w3-section">
                         <label><b>Enter your name</b></label>
                         <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter your name"
-                               name="usrname" required v-model="name" @keyup.enter="showModal = false; this.joinGame()">
+                               name="playername" required v-model="name" @keyup.enter="showModal = false; this.joinGame()">
                         <button @click="showModal = false; this.joinGame()"
                                 class="w3-button w3-block w3-green w3-section w3-padding w3-round" type="submit">Join
                         </button>
