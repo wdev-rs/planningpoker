@@ -69,7 +69,7 @@ export default {
             //     speechSynthesis.speak(text);
             // }
 
-            setTimeout(()=> this.shake_it_player_id = null, 1000);
+            setTimeout(() => this.shake_it_player_id = null, 1000);
         });
     },
     methods: {
