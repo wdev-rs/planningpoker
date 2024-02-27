@@ -1,5 +1,8 @@
 {
     "require": {
         "deployer/deployer": "^7.0"
+    },
+    "require-dev": {
+        "liip/rmt": "^1.7"
     }
 }
