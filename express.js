@@ -87,6 +87,11 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on("shake", (...args) =>  {
+        let data = args.pop();
+        io.to(game_id).emit("shake", data);
+    });
+
 
     socket.on('disconnect', () => {
         socket.leave(socket.handshake.auth.game_id);

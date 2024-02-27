@@ -20,6 +20,7 @@ export default {
             showModal: false,
             bonusPoint: null,
             darkMode: false,
+            shake_it_player_id: null
         }
     },
     mounted() {
@@ -59,6 +60,16 @@ export default {
             this.points = null;
             this.selectBonusPoint();
             state.game.status = GAME_STATUS_PLAYING;
+        });
+
+        socket.on('shake', (...args) => {
+            this.shake_it_player_id = args.pop();
+            // if (this.shake_it_player_id === this.player_id && this.points === null) {
+            //     let text = new SpeechSynthesisUtterance(this.name + ", please point!");
+            //     speechSynthesis.speak(text);
+            // }
+
+            setTimeout(()=> this.shake_it_player_id = null, 1000);
         });
     },
     methods: {
@@ -108,6 +119,13 @@ export default {
             else {
                 document.body.style.backgroundColor = '#FFF';
             }
+        },
+        shake(player_id){
+            if (player_id === this.player_id) {
+                // Don't shake yourselves
+                return;
+            }
+            socket.emit('shake', player_id);
         }
     },
     computed: {
@@ -162,8 +180,8 @@ export default {
         </div>
 
         <div class="w3-container w3-margin-top w3-padding-32 flexible-container">
-            <div v-for="player in players" class="w3-container w3-margin-top">
-                <card :name="player.name" :points="player.points" :is-revealed="this.isRevealed"
+            <div v-for="player in players" class="w3-container w3-margin-top" >
+                <card @click="shake(player.player_id)" :class="this.shake_it_player_id === player.player_id ? 'shake' : ''" :name="player.name" :points="player.points" :is-revealed="this.isRevealed"
                       :is-ready="player.points" :is-my-card="player.player_id === this.player_id"></card>
             </div>
         </div>
@@ -185,6 +203,19 @@ export default {
     .flexible-container {
         display:flex;
         flex-wrap: wrap
+    }
+
+    @keyframes tilt-shaking {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(5deg); }
+        50% { transform: rotate(0eg); }
+        75% { transform: rotate(-5deg); }
+        100% { transform: rotate(0deg); }
+    }
+
+    .shake {
+        animation: tilt-shaking 0.25s linear;
+        animation-iteration-count: 3;
     }
 
 </style>
