@@ -40,6 +40,9 @@ export default {
             sessionStorage.setItem(this.game_id + '_player_id', this.player_id);
         }
 
+        this.darkMode = JSON.parse(localStorage.getItem('darkMode')) || false;
+        this.setDarkMode(this.darkMode);
+
         socket.auth = {
             game_id: this.$route.params.id,
             player_id: this.player_id
@@ -112,8 +115,12 @@ export default {
         },
         toggleDarkMode(){
             this.darkMode = !this.darkMode;
+            localStorage.setItem('darkMode', this.darkMode);
 
-            if (this.darkMode) {
+            this.setDarkMode(this.darkMode);
+        },
+        setDarkMode(darkMode) {
+            if (darkMode) {
                 document.body.style.backgroundColor = '#3C3C3C';
             }
             else {
@@ -126,7 +133,7 @@ export default {
                 return;
             }
             socket.emit('shake', player_id);
-        }
+        },
     },
     computed: {
         connected() {
