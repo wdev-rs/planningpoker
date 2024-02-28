@@ -110,7 +110,7 @@ export default {
             socket.emit('reset');
         },
         selectBonusPoint() {
-            let points = ['🍺', '🍨', '☕', '🌮', '🍕','🍪', '🍫'];
+            let points = ['🍺', '🍨', '☕', '🌮', '🍕','🍪', '🍫','🍔','🍩','🥞','🍸'];
             this.bonusPoint = points[Math.floor(Math.random() * points.length)];
         },
         toggleDarkMode(){
@@ -132,6 +132,12 @@ export default {
                 // Don't shake yourselves
                 return;
             }
+
+            if (state.players.hasOwnProperty(player_id) && state.players[player_id]?.points !== null) {
+                // Don't shake who already pointed
+                return;
+            }
+            
             socket.emit('shake', player_id);
         },
     },
