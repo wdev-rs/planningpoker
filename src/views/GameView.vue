@@ -67,10 +67,10 @@ export default {
 
         socket.on('shake', (...args) => {
             this.shake_it_player_id = args.pop();
-            // if (this.shake_it_player_id === this.player_id && this.points === null) {
-            //     let text = new SpeechSynthesisUtterance(this.name + ", please point!");
-            //     speechSynthesis.speak(text);
-            // }
+            if (this.shake_it_player_id === this.player_id && this.points === null) {
+                let text = new SpeechSynthesisUtterance(this.name + ", please point!");
+                speechSynthesis.speak(text);
+            }
 
             setTimeout(() => this.shake_it_player_id = null, 1000);
         });
