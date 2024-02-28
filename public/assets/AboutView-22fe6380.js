@@ -1,1 +1,0 @@
-import{_ as t}from"./_plugin-vue_export-helper-c27b6911.js";import{o,c as n,a as e,j as s}from"./index-b50251f9.js";const _={},a={class:"w3-containter w3-padding-64 w3-center"},c=e("h1",null,[s("Planning poker by "),e("a",{href:"https://www.wdev.rs",target:"_blank"},"WDev")],-1),r=[c];function i(d,l){return o(),n("div",a,r)}const f=t(_,[["render",i]]);export{f as default};
