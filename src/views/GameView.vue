@@ -110,10 +110,10 @@ export default {
             socket.emit('reset');
         },
         selectBonusPoint() {
-            let points = ['🍺', '🍨', '☕', '🌮', '🍕','🍪', '🍫','🍔','🍩','🥞','🍸'];
+            let points = ['🍺', '🍨', '☕', '🌮', '🍕', '🍪', '🍫', '🍔', '🍩', '🥞', '🍸'];
             this.bonusPoint = points[Math.floor(Math.random() * points.length)];
         },
-        toggleDarkMode(){
+        toggleDarkMode() {
             this.darkMode = !this.darkMode;
             localStorage.setItem('darkMode', this.darkMode);
 
@@ -122,12 +122,11 @@ export default {
         setDarkMode(darkMode) {
             if (darkMode) {
                 document.body.style.backgroundColor = '#3C3C3C';
-            }
-            else {
+            } else {
                 document.body.style.backgroundColor = '#FFF';
             }
         },
-        shake(player_id){
+        shake(player_id) {
             if (player_id === this.player_id) {
                 // Don't shake yourselves
                 return;
@@ -137,9 +136,33 @@ export default {
                 // Don't shake who already pointed
                 return;
             }
-            
+
             socket.emit('shake', player_id);
         },
+        launch(player_id) {
+                let leftFrom = this.$refs[this.player_id][0].$el.getBoundingClientRect().left;
+                let topFrom = this.$refs[this.player_id][0].$el.getBoundingClientRect().top;
+
+            let leftTo = this.$refs[player_id][0].$el.getBoundingClientRect().left;
+            let topTo = this.$refs[player_id][0].$el.getBoundingClientRect().top;
+
+
+            let weapon = this.$refs.weapon;
+
+                weapon.style.left = leftFrom + 40 + 'px';
+                weapon.style.top = topFrom + 60 + 'px';
+
+                weapon.style.display = 'block';
+
+                setTimeout(() => {
+                    weapon.style.left = leftTo + 40 + 'px';
+                    weapon.style.top = topTo + 60 + 'px';
+                }, 0);
+
+                setTimeout(() => {
+                    weapon.style.display = 'none'
+                }, 700)
+        }
     },
     computed: {
         connected() {
@@ -160,7 +183,7 @@ export default {
         selectablePoints() {
             return [1, 2, 3, 5, 8, 13];
         },
-    }
+    },
 }
 </script>
 
@@ -171,8 +194,14 @@ export default {
                     <button class="w3-margin w3-button w3-large w3-round-large w3-green" @click="reveal">Reveal</button>
                     <button class="w3-margin w3-button w3-large w3-round-large w3-blue" @click="reset">Restart</button>
              </span>
-            <button class="w3-margin w3-button w3-large w3-white w3-border w3-border-green w3-round-large  w3-text-green" @click="showModal=true">Change my name</button>
-            <button class="w3-margin w3-button w3-large w3-border w3-border-green w3-round-large  w3-text-green" :class="{'w3-white': darkMode, 'w3-black': !darkMode }" @click="toggleDarkMode">{{!darkMode ? 'Dark mode' : 'Light mode'}}</button>
+            <button
+                class="w3-margin w3-button w3-large w3-white w3-border w3-border-green w3-round-large  w3-text-green"
+                @click="showModal=true">Change my name
+            </button>
+            <button class="w3-margin w3-button w3-large w3-border w3-border-green w3-round-large  w3-text-green"
+                    :class="{'w3-white': darkMode, 'w3-black': !darkMode }" @click="toggleDarkMode">
+                {{ !darkMode ? 'Dark mode' : 'Light mode' }}
+            </button>
         </div>
 
         <div id="id01" class="w3-modal" :style="showModal ? 'display: block' : 'display: none'">
@@ -183,7 +212,8 @@ export default {
                     <div class="w3-section">
                         <label><b>Enter your name</b></label>
                         <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter your name"
-                               name="playername" required v-model="name" @keyup.enter="showModal = false; this.joinGame()">
+                               name="playername" required v-model="name"
+                               @keyup.enter="showModal = false; this.joinGame()">
                         <button @click="showModal = false; this.joinGame()"
                                 class="w3-button w3-block w3-green w3-section w3-padding w3-round" type="submit">Join
                         </button>
@@ -191,10 +221,15 @@ export default {
                 </div>
             </div>
         </div>
+        <div ref="weapon" class="weapon move-animation">
+            ⏱
+        </div>
 
         <div class="w3-container w3-margin-top w3-padding-32 flexible-container">
-            <div v-for="player in players" class="w3-container w3-margin-top" >
-                <card @click="shake(player.player_id)" :class="this.shake_it_player_id === player.player_id ? 'shake' : ''" :name="player.name" :points="player.points" :is-revealed="this.isRevealed"
+            <div v-for="player in players" class="w3-container w3-margin-top">
+                <card :ref="player.player_id" @click="launch(player.player_id)"
+                      :class="this.shake_it_player_id === player.player_id ? 'shake' : ''" :name="player.name"
+                      :points="player.points" :is-revealed="this.isRevealed"
                       :is-ready="player.points" :is-my-card="player.player_id === this.player_id"></card>
             </div>
         </div>
@@ -213,22 +248,44 @@ export default {
 </template>
 
 <style scoped>
-    .flexible-container {
-        display:flex;
-        flex-wrap: wrap
-    }
+.flexible-container {
+    display: flex;
+    flex-wrap: wrap
+}
 
-    @keyframes tilt-shaking {
-        0% { transform: rotate(0deg); }
-        25% { transform: rotate(5deg); }
-        50% { transform: rotate(0eg); }
-        75% { transform: rotate(-5deg); }
-        100% { transform: rotate(0deg); }
+@keyframes tilt-shaking {
+    0% {
+        transform: rotate(0deg);
     }
+    25% {
+        transform: rotate(5deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+    75% {
+        transform: rotate(-5deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
 
-    .shake {
-        animation: tilt-shaking 0.25s linear;
-        animation-iteration-count: 3;
-    }
+.shake {
+    animation: tilt-shaking 0.25s linear;
+    animation-iteration-count: 3;
+}
+
+.weapon {
+    display: none;
+    position: absolute;
+    font-size: 3rem;
+}
+
+.move-animation {
+    transition-property: left,top;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in;
+}
 
 </style>
