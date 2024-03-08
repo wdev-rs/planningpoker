@@ -149,19 +149,22 @@ export default {
 
             let weapon = this.$refs.weapon;
 
-                weapon.style.left = leftFrom + 40 + 'px';
-                weapon.style.top = topFrom + 60 + 'px';
+                weapon.style.display = 'hidden';
+                weapon.style.left = leftFrom + 20 + 'px';
+                weapon.style.top = topFrom + 20 + 'px';
+                weapon.style.rotate = '0deg'
 
                 weapon.style.display = 'block';
 
                 setTimeout(() => {
-                    weapon.style.left = leftTo + 40 + 'px';
-                    weapon.style.top = topTo + 60 + 'px';
+                    weapon.style.left = leftTo + 20 + 'px';
+                    weapon.style.top = topTo + 20 + 'px';
+                    weapon.style.rotate = 720+'deg';
                 }, 0);
 
                 setTimeout(() => {
                     weapon.style.display = 'none'
-                }, 700)
+                }, 1000)
         }
     },
     computed: {
@@ -279,11 +282,11 @@ export default {
 .weapon {
     display: none;
     position: absolute;
-    font-size: 3rem;
+    font-size: 7rem;
 }
 
 .move-animation {
-    transition-property: left,top;
+    transition-property: left,top,rotate;
     transition-duration: 0.5s;
     transition-timing-function: ease-in;
 }
