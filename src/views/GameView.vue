@@ -74,6 +74,38 @@ export default {
 
             setTimeout(() => this.shake_it_player_id = null, 1000);
         });
+
+        socket.on('clock', (from_player_id, to_player_id) => {
+
+            if (this.points !== null) {
+                return;
+            }
+
+            let leftFrom = window.scrollX + this.$refs[from_player_id][0].$el.getBoundingClientRect().left;
+            let topFrom = window.scrollY + this.$refs[from_player_id][0].$el.getBoundingClientRect().top;
+
+            let leftTo = window.scrollX + this.$refs[to_player_id][0].$el.getBoundingClientRect().left;
+            let topTo = window.scrollY + this.$refs[to_player_id][0].$el.getBoundingClientRect().top;
+
+            let weapon = this.$refs['weapon-' + this.player_id][0];
+
+            weapon.style.display = 'none';
+            weapon.style.left = leftFrom + 25 + 'px';
+            weapon.style.top = topFrom + 25 + 'px';
+            weapon.style.rotate = '0deg'
+
+            weapon.style.display = 'block';
+
+            setTimeout(() => {
+                weapon.style.left = leftTo + 25 + 'px';
+                weapon.style.top = topTo + 25 + 'px';
+                weapon.style.rotate = (leftFrom > leftTo ? -720 : 720) + 'deg';
+            }, 10);
+
+            setTimeout(() => {
+                weapon.style.display = 'none';
+            }, 1000);
+        })
     },
     methods: {
         joinGame() {
@@ -139,32 +171,8 @@ export default {
 
             socket.emit('shake', player_id);
         },
-        launch(player_id) {
-                let leftFrom = this.$refs[this.player_id][0].$el.getBoundingClientRect().left;
-                let topFrom = this.$refs[this.player_id][0].$el.getBoundingClientRect().top;
-
-            let leftTo = this.$refs[player_id][0].$el.getBoundingClientRect().left;
-            let topTo = this.$refs[player_id][0].$el.getBoundingClientRect().top;
-
-
-            let weapon = this.$refs.weapon;
-
-                weapon.style.display = 'hidden';
-                weapon.style.left = leftFrom + 20 + 'px';
-                weapon.style.top = topFrom + 20 + 'px';
-                weapon.style.rotate = '0deg'
-
-                weapon.style.display = 'block';
-
-                setTimeout(() => {
-                    weapon.style.left = leftTo + 20 + 'px';
-                    weapon.style.top = topTo + 20 + 'px';
-                    weapon.style.rotate = 720+'deg';
-                }, 0);
-
-                setTimeout(() => {
-                    weapon.style.display = 'none'
-                }, 1000)
+        throwClock(to_player_id) {
+            socket.emit('clock', this.player_id, to_player_id);
         }
     },
     computed: {
@@ -224,16 +232,29 @@ export default {
                 </div>
             </div>
         </div>
-        <div ref="weapon" class="weapon move-animation">
-            ⏱
-        </div>
 
         <div class="w3-container w3-margin-top w3-padding-32 flexible-container">
-            <div v-for="player in players" class="w3-container w3-margin-top">
-                <card :ref="player.player_id" @click="launch(player.player_id)"
-                      :class="this.shake_it_player_id === player.player_id ? 'shake' : ''" :name="player.name"
-                      :points="player.points" :is-revealed="this.isRevealed"
-                      :is-ready="player.points" :is-my-card="player.player_id === this.player_id"></card>
+            <div v-for="player in players" class="card-container w3-container w3-margin-top">
+                <div :ref="'weapon-'+player.player_id" class="weapon move-animation">
+                    ⏱
+                </div>
+
+                <div class="relative">
+                    <div v-if="player.player_id !== player_id && player.points === null" class="notifiers">
+                    <span
+                        @click="throwClock(player.player_id)"
+                        class="move-animation"
+                    >⏱
+                    </span>
+                        <span @click="shake(player.player_id)">📣</span>
+                    </div>
+                    <card :ref="player.player_id" @click=""
+                          :class="this.shake_it_player_id === player.player_id ? 'shake' : ''" :name="player.name"
+                          style="cursor: auto"
+                          :points="player.points" :is-revealed="this.isRevealed"
+                          :is-ready="player.points" :is-my-card="player.player_id === this.player_id">
+                    </card>
+                </div>
             </div>
         </div>
 
@@ -282,13 +303,36 @@ export default {
 .weapon {
     display: none;
     position: absolute;
-    font-size: 7rem;
+    z-index: 10;
+    font-size: 6rem;
 }
 
 .move-animation {
-    transition-property: left,top,rotate;
+    transition-property: left, top, rotate;
     transition-duration: 0.5s;
     transition-timing-function: ease-in;
+}
+
+.notifiers {
+    display: none;
+    left: 5px;
+    bottom: 5px;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    padding: 10px;
+    cursor: pointer;
+    background-color: rgba(200, 200, 200, 0.4);
+    width: 136px;
+}
+
+.relative {
+    position: relative;
+}
+
+.card-container:hover .notifiers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
 </style>

@@ -92,6 +92,9 @@ io.on('connection', (socket) => {
         io.to(game_id).emit("shake", data);
     });
 
+    socket.on("clock", (from_player_id, to_player_id) =>  {
+        io.to(game_id).emit("clock", from_player_id, to_player_id);
+    });
 
     socket.on('disconnect', () => {
         socket.leave(socket.handshake.auth.game_id);
