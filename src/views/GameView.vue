@@ -318,6 +318,7 @@ export default {
     left: 5px;
     bottom: 5px;
     border-radius: 5px;
+    position: absolute;
     font-size: 1.5rem;
     padding: 10px;
     cursor: pointer;
